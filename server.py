@@ -32,6 +32,31 @@ def user_list():
     users = User.query.all()
     return render_template("user_list.html", users=users)
 
+@app.route('/users/<int:user_id>')
+def user_info(user_id):
+    """query database for user info to display"""
+
+    user = User.query.filter(User.user_id==user_id).one()
+    movies = Rating.query.filter(Rating.user_id==user_id).all()
+
+    return render_template("user_details.html", user=user, movies=movies)
+
+@app.route("/movies")
+def movie_list():
+    """Show list of movies."""
+
+    movies = sorted(db.session.query(Movie.title, Movie.movie_id).all())
+    return render_template("movie_list.html", movies=movies)
+
+@app.route('/movies/<int:movie_id>')
+def movie_info(user_id):
+    """query database for movie info to display"""
+
+    user = User.query.filter(User.user_id==user_id).one()
+    movies = Rating.query.filter(Rating.user_id==user_id).all()
+
+    return render_template("user_details.html", user=user, movies=movies)
+
 @app.route("/register", methods=['POST'])
 def create_new_user():
     """Register new user."""
@@ -52,19 +77,23 @@ def create_new_user():
 def login():
     """Log In user."""
 
+## FIX THIS LATER IF WE HAVE TIME, GHETTO CODEEEE
+
     user_info = db.session.query(User.email, User.password).all()
 
     email = request.form.get("email")
     password = request.form.get("password")
     user = (email, password)
 
+    user_id = db.session.query(User.user_id).filter(User.email == email).one()[0]
+
     if user in user_info:
         session['current_user'] = email
         flash('Successfully logged in as {}'.format(email))
+        return redirect("/users/{}".format(user_id))
     else:
         flash("Begone imposter!!")
 
-    return redirect("/")
 
 @app.route("/logout")
 def logout():

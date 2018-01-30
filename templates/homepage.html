@@ -14,7 +14,7 @@
 <p><a href="/users">View all users</a></p>
 
 {% if session.get('current_user') %}
-<form action="/logout" method="POST">
+<form action="/logout">
 <input type="submit" value="We'll miss ya">
 {% else %}
 <p>Log In!<br>

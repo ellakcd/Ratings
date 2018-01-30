@@ -3,16 +3,16 @@
 {% block theme %}Hello {{ session.get('current_user') }}, you stalker{% endblock %}
 {% block content %}
 
-<h2>{{ }}</h2>
+<h2>{{ user.user_id }}</h2>
 
   <ul>
-    {% for user in users %}
-      <li>
-        <a href="/users/{{ user.user_id }}">
-          {{ user.email }} ({{ user.user_id }})
-        </a>
-      </li>
+    <li>Age: {{ user.age }}</li> <br>
+    <li>Zipcode: {{ user.zipcode }}</li> <br>
+    Movies Rated:<br>
+    {% for movie in movies %}
+        <li>{{movie.movie.title}}: {{ movie.rating }}</li>
     {% endfor %}
+</li> <br>
   </ul>
 
 {% endblock %}
