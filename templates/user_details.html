@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}User Details{% endblock %}
+{% block theme %}Hello {{ session.get('current_user') }}, you stalker{% endblock %}
+{% block content %}
+
+<h2>{{ }}</h2>
+
+  <ul>
+    {% for user in users %}
+      <li>
+        <a href="/users/{{ user.user_id }}">
+          {{ user.email }} ({{ user.user_id }})
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}
