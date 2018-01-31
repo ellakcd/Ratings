@@ -1,7 +1,7 @@
 """Models and database functions for Ratings project."""
 
 from flask_sqlalchemy import SQLAlchemy
-
+import correlation
 # This is the connection to the PostgreSQL database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
 # object, where we do most of our interactions (like committing, etc.)
@@ -73,7 +73,6 @@ class Rating(db.Model):
 
         return "<Rating movie_id={} rating={} rating_id, user_id>".format(self.movie_id,
                                            self.rating)
-
 
 
 

@@ -36,7 +36,7 @@ def user_list():
 def user_info(user_id):
     """query database for user info to display"""
 
-    user = User.query.filter(User.user_id==user_id).one()
+    user = User.query.get(user_id)
     movies = Rating.query.filter(Rating.user_id==user_id).all()
 
     return render_template("user_details.html", user=user, movies=movies)
@@ -49,13 +49,35 @@ def movie_list():
     return render_template("movie_list.html", movies=movies)
 
 @app.route('/movies/<int:movie_id>')
-def movie_info(user_id):
+def movie_info(movie_id):
     """query database for movie info to display"""
 
-    user = User.query.filter(User.user_id==user_id).one()
-    movies = Rating.query.filter(Rating.user_id==user_id).all()
+    movie = Movie.query.get(movie_id)
+    ratings = Rating.query.filter(Rating.movie_id==movie_id).all()
+    return render_template("movie_details.html", movie=movie, ratings=ratings)
 
-    return render_template("user_details.html", user=user, movies=movies)
+
+@app.route('/add_rating', methods=['POST'])
+def add_rating():
+    """add rating to database"""
+    movie_id = request.form['movie_id']
+    new_rating = request.form['rating']
+    user_id = session["current_user"]
+
+    try:
+        rating = Rating.query.filter(Rating.movie_id==movie_id,
+                                  Rating.user_id==user_id).one()
+        rating.rating = new_rating
+    except:
+        db.session.add(Rating(user_id=user_id,
+                        movie_id=movie_id,
+                        rating=new_rating
+                        ))
+
+    db.session.commit()
+
+
+    return redirect("/movies")
 
 @app.route("/register", methods=['POST'])
 def create_new_user():
@@ -88,7 +110,7 @@ def login():
     user_id = db.session.query(User.user_id).filter(User.email == email).one()[0]
 
     if user in user_info:
-        session['current_user'] = email
+        session['current_user'] = user_id
         flash('Successfully logged in as {}'.format(email))
         return redirect("/users/{}".format(user_id))
     else:
