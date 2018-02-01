@@ -13,6 +13,12 @@ Ratings:
 </ul>
 
 {% if session %}
+
+<p>Average rating: {{ average }}</p>
+{% if prediction %}
+    <p>We predict you will rate this movie {{ prediction }}.</p>
+{% endif %}
+
 <form action="/add_rating" method="POST">
     <select name="rating">
         {% for num in range(1,6) %}

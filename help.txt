@@ -1,0 +1,31 @@
+1. create empty dict of user ratings
+u_ratings = {}
+
+2. for rating in ratings by that specific user
+for r in u.ratings:
+
+3. put in dict with movie ID as key, rating as value
+     u_ratings[r.movie_id] = r
+
+4.
+paired_ratings = []
+
+5. if you have a rating for that movie,
+create a tuple pair of (my rating, other person's rating)
+append to list
+
+o = other_users[0]
+other_users is a list of people who have rated the movie we're trying
+to get a predction for
+
+u.rating = everything I've rated
+o. rating = everything that other user has rated
+
+*** pull this user's ratings for every other movie that I have also
+rated to get a prediction coeff**
+
+for o_rating in o.ratings:
+     u_rating = u_ratings.get(o_rating.movie_id)
+     if u_rating:
+         pair = (u_rating.score, o_rating.score)
+         paired_ratings.append(pair)

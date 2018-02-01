@@ -50,11 +50,64 @@ def movie_list():
 
 @app.route('/movies/<int:movie_id>')
 def movie_info(movie_id):
-    """query database for movie info to display"""
+    """query database for movie info to display
+    If user is logged in, allow edit/add rating
+    Give predictive rating
+    """
 
     movie = Movie.query.get(movie_id)
-    ratings = Rating.query.filter(Rating.movie_id==movie_id).all()
-    return render_template("movie_details.html", movie=movie, ratings=ratings)
+    ratings = (Rating.query
+              .filter(Rating.movie_id==movie_id)
+              .order_by(Rating.user_id).all())
+
+    # check if user is logged in & has rating data
+    user_id = session.get("current_user")
+
+    if user_id:
+        user_rating = Rating.query.filter_by(
+            movie_id=movie_id, user_id=user_id).first()
+    else:
+        user_rating = None
+
+
+    # list of all the ratings for this movie
+    rating_scores = [r.rating for r in movie.ratings]
+    avg_rating = float(sum(rating_scores))/ len(rating_scores)
+
+    prediction = None
+
+    # prediction
+
+    if (not user_rating) and user_id:
+        # if user not rated, we predict
+        user = User.query.get(user_id)
+        prediction = user.predict_rating(movie)
+
+    display = None
+
+    if prediction:
+        display = prediction
+    elif user_rating:
+        display = user_rating.rating
+
+    le_eye = (User.query.filter_by(email="theeye@ofjudgment.com").one())
+    judgment = Rating.query.filter_by(
+        user_id=le_eye.user_id, movie_id=movie.movie_id).first()
+
+    if not judgment:
+        judgment = le_eye.predict_rating(movie)
+    else:
+        judgment = judgment.rating
+
+    difference = None
+    if judgment and display:
+        difference = abs(judgment - display)
+
+    return render_template("movie_details.html",
+                            movie=movie,
+                            ratings=ratings,
+                            average=avg_rating,
+                            prediction=prediction)
 
 
 @app.route('/add_rating', methods=['POST'])
@@ -77,7 +130,7 @@ def add_rating():
     db.session.commit()
 
 
-    return redirect("/movies")
+    return redirect("/movies/{}".format(movie_id))
 
 @app.route("/register", methods=['POST'])
 def create_new_user():

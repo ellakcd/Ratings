@@ -23,6 +23,60 @@ class User(db.Model):
     age = db.Column(db.Integer, nullable=True)
     zipcode = db.Column(db.String(15), nullable=True)
 
+    def similarity(self, other):
+        """Find the pearson correlation between self & other user"""
+        # 1. {}
+        # 2. [()]
+
+        # go through all the ratings & add to dict w/ movie_id : rating
+        # check if other user has rated the same movie,
+        #     if yes, push pair into list of tuples
+
+
+        # if the list exists,
+        # pass list through pearson coeff,
+        # if it is empty,
+        #     else, return 0
+
+        u_ratings = {}
+        pairs = []
+
+        for rating in self.ratings:
+            u_ratings[rating.movie_id] = rating.rating
+
+        for r in other.ratings:
+            # print "I am other user's rating!!\n\n\n"
+            # print r
+            if r.movie_id in u_ratings.keys():
+                pairs.append((u_ratings[r.movie_id], r.rating))
+
+        if pairs:
+            return correlation.pearson(pairs)
+        else:
+            return 0.0
+
+    def predict_rating(self, movie):
+        """Predict how a user would rate a movie given movie object"""
+
+        #how other users rated Toy Story
+        other_ratings = movie.ratings
+
+        # list of tuples, of (pearson coeff between me & user, user's rating)
+        similarities = sorted([
+            (self.similarity(r.user), r)
+            for r in other_ratings
+            if self.similarity(r.user) > 0
+            ], reverse=True)
+
+        if not similarities:
+            return None
+
+        # weighted mean/ predicted rating = sum(ratings * coeffs)/ sum(coeffs)
+        numerator = sum([r.rating * sim for sim, r in similarities])
+        denominator = sum([sim for sim, r in similarities])
+
+        return numerator / denominator
+
     def __repr__(self):
         """provide helpful representation when printed"""
 
