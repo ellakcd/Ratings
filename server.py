@@ -85,9 +85,7 @@ def movie_info(movie_id):
 
     display = None
 
-    if prediction:
-        display = prediction
-    elif user_rating:
+    if user_rating:
         display = user_rating.rating
 
     le_eye = (User.query.filter_by(email="theeye@ofjudgment.com").one())
@@ -103,11 +101,27 @@ def movie_info(movie_id):
     if judgment and display:
         difference = abs(judgment - display)
 
+    BERATEMENT_MESSAGES = [
+     "You don't disgust me, only mildly distasteful.",
+     "Roses are red, violets are blue.  Your movie taste sucks.",
+     "Your taste in movies reminds me of Melania Trump's taste in men.",
+     "I would rather watch paint dry, than a movie you like.",
+     "I enjoy your opinion as much as I enjoy being poked in the eye slowly and repetitively."
+    ]
+
+    if difference >= 0:
+        beratement = BERATEMENT_MESSAGES[int(difference)]
+    else:
+        beratement = None
+
     return render_template("movie_details.html",
                             movie=movie,
                             ratings=ratings,
                             average=avg_rating,
-                            prediction=prediction)
+                            prediction=prediction,
+                            beratement=beratement,
+                            judgment=judgment
+                            )
 
 
 @app.route('/add_rating', methods=['POST'])

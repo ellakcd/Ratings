@@ -2,6 +2,7 @@
 {% block title %}Movie Details{% endblock %}
 
 {% block content %}
+<a href="/movies">Back to Movies</a><br>
 
 <h2>{{ movie.title }}</h2>
 
@@ -17,6 +18,14 @@ Ratings:
 <p>Average rating: {{ average }}</p>
 {% if prediction %}
     <p>We predict you will rate this movie {{ prediction }}.</p>
+{% endif %}
+
+{% if beratement %}
+The mighty wise eye has spoken:
+<h3>{{ judgment }}</h3>
+<h2>{{ beratement }}</h2>
+{% else %}
+<h2>The eye is asleep.</h2>
 {% endif %}
 
 <form action="/add_rating" method="POST">

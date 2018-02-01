@@ -68,6 +68,8 @@ class User(db.Model):
             if self.similarity(r.user) > 0
             ], reverse=True)
 
+        # print self.email
+        # import pdb; pdb.set_trace()
         if not similarities:
             return None
 
